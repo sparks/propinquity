@@ -1,1 +1,41 @@
-https://github.com/linse/propinquityclick on zip Ð and this is the latest.UnzipOpen terminalCD (change directory) command to go into the directoryCD Òname of directoryÓ  (or I can grab the folder I just unzipped and drag it next to CD space Ðpropinquity>software)For example:Janes-Mac-Pro:~ janetingley$ cd /Users/janetingley/Desktop/propinquity/Source\ Code/propinquity-May1/software(I can also write ls (list) if I want to see what is in the directory.)then type Ð antshould run Ð if not Ð check the error message.  (if not Ð perhaps missing sound files?)There is a launcher Ð Propinquity> software > launchers    may or may not workVocabLevel is comprised of 4 roundsDetailsSpace bar Ð to move through the program when it is running.Delete Ð backwardsEsc Ð quitE Ð end Ð jumps to ends- skip current level and goes to next transitiona Ð adjust the visuals (circle) and arrow keys Ð x and y axis.
+NB! Make sure you have the VCP drivers from ftdichip.com installed!
+
+
+https://github.com/linse/propinquity
+
+click on zip ï¿½ and this is the latest.
+
+Unzip
+
+Open terminal
+
+CD (change directory) command to go into the directory
+
+CD ï¿½name of directoryï¿½  (or I can grab the folder I just unzipped and drag it next to CD space ï¿½propinquity>software)
+For example:
+Janes-Mac-Pro:~ janetingley$ cd /Users/janetingley/Desktop/propinquity/Source\ Code/propinquity-May1/software
+
+(I can also write ls (list) if I want to see what is in the directory.)
+
+then type ï¿½ ant
+
+should run ï¿½ if not ï¿½ check the error message.  (if not ï¿½ perhaps missing sound files?)
+
+There is a launcher ï¿½ Propinquity> software > launchers    may or may not work
+
+
+
+Vocab
+
+Level is comprised of 4 rounds
+
+
+Details
+
+Space bar ï¿½ to move through the program when it is running.
+Delete ï¿½ backwards
+Esc ï¿½ quit
+E ï¿½ end ï¿½ jumps to end
+s- skip current level and goes to next transition
+a ï¿½ adjust the visuals (circle) and arrow keys ï¿½ x and y axis.
+
