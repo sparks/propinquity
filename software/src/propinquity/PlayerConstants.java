@@ -10,8 +10,8 @@ public interface PlayerConstants {
 	public static final int MAX_PLAYERS = 2;
 
 	public static final int[][] PATCH_ADDR = new int[][] {
-		{1, 2, 3, 4}, //Player 1
-		{6, 7, 8, 9} //Player 2
+		{1, 2, 3 }, //Player 1
+		{6, 7, 8 } //Player 2
 	};
 
 	public static final int[] GLOVE_ADDR = new int[] {

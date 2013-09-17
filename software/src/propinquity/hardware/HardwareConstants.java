@@ -8,9 +8,9 @@ public interface HardwareConstants {
 
 	static final boolean MIN_PACK = false;
 	static final boolean MANUAL_PACK = true;
-	static final boolean USE_DAEMON = false;
+	static final boolean USE_DAEMON = true;
 	static final boolean DAEMON_ACTIVE_ONLY = false;
-	static final int DAEMON_PERIOD = 750;
+	static final int DAEMON_PERIOD = 500;
 
 	static final int SLOW_BLINK = 15;
 	static final int FAST_BLINK = 10;
