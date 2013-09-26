@@ -311,8 +311,10 @@ public class XBeeBaseStation implements Runnable, HardwareInterface, PacketListe
 
 	public void sendPacket(Packet packet) {
 		if(xbees.size() == 0) return;
-		// sendPacketAsynchronous(packet);
-		sendPacketThrottled(packet);
+		// sendPacketSynchrous(packet);
+		sendPacketAsynchronous(packet);
+		// sendPacketAsynchronousWithMonitor(packet);
+		// sendPacketThrottled(packet);
 	}
 
 	int getNextFrameId() {
@@ -377,6 +379,18 @@ public class XBeeBaseStation implements Runnable, HardwareInterface, PacketListe
 	}
 
 	public void sendPacketAsynchronous(Packet packet) {
+		TxRequest16 request = generateRequest(packet);
+		
+		for(XBee xbee : xbees.values()) {
+			try {
+				xbee.sendAsynchronous(request);
+			} catch(XBeeException e) {
+				System.out.println("\t\tException sending request");
+			}
+		}
+	}
+
+	public void sendPacketAsynchronousWithMonitor(Packet packet) {
 		TxRequest16 request = generateRequest(packet);
 		
 		//Request monitor does all the sending
@@ -508,7 +522,7 @@ public class XBeeBaseStation implements Runnable, HardwareInterface, PacketListe
 				if(throttledPackets.size() == 0) {
 					Thread.yield();
 				} else {
-					sendPacketAsynchronous(throttledPackets.remove(0));
+					sendPacketAsynchronousWithMonitor(throttledPackets.remove(0));
 					// System.out.println(throttledPackets.size());
 					try {
 						if(throttledPackets.size() < 100) Thread.sleep(1);

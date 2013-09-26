@@ -11,9 +11,9 @@ import java.lang.Math;
 public class Player implements PConstants {
 	
 	public static final int SPAWN_DELAY_SHORT = 200;
-	public static final int SPAWN_DELAY_MED = 500;
-	public static final int SPAWN_DELAY_LONG = 500;
-	public static final double SPAWN_DELAY_TAU = 2000;
+	public static final int SPAWN_DELAY_MED = 450;
+	public static final int SPAWN_DELAY_LONG = 750;
+	public static final double SPAWN_DELAY_TAU = 1000;
 
 	public static final int MAX_HEALTH = 1;
 	
