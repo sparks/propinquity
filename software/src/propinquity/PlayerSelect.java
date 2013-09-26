@@ -44,7 +44,7 @@ public class PlayerSelect implements UIElement {
 	}
 
 	public void reset() {
-		cleanup();
+		// cleanup(); //NOTE: running cleanup here seems to sometimes break box2d, some sort of race condition I would assume
 		for(Player player : players) player.setName(null);
 		stateChange(0);
 	}
