@@ -14,7 +14,7 @@ import java.lang.Math;
  */
 public class ProxLevel extends Level {
 
-	static int TOTAL_LEN = 180000; //3min;
+	static int TOTAL_LEN = 150000; //2.5min;
 
 	long[] lastScoreTime;
 	long[] lastScoreTimePauseDiff;
