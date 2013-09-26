@@ -27,6 +27,8 @@
 	<target name="clean">
 		<delete dir="${build.dir}"/>
 		<delete dir="${ref.dir}"/>
+		<delete file="./data/scaling.ser"/>
+		<delete file="./data/basePortNames.ser"/>
 	</target>
 
 	<target name="doc">
