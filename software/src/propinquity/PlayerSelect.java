@@ -24,8 +24,6 @@ public class PlayerSelect implements UIElement {
 
 	boolean isVisible;
 
-	ColorHacker colorHack; //TODO: Hack to get the patches to come on, should be resolved maybe be with timestamps on packets.
-
 	public PlayerSelect(Propinquity parent, Hud hud, Player[] players) {
 		this.parent = parent;
 		this.hud = hud;
@@ -56,9 +54,15 @@ public class PlayerSelect implements UIElement {
 		if(state < playerNames.length) {
 			while(nameTaken(playerNames[selected])) selected = (selected + 1) % playerNames.length;
 			
-			if(colorHack == null) colorHack = new ColorHacker();
-
 			createParticles(playerNames.length, players[state].getColor());
+
+			for(Patch patch : players[state].getPatches()) {
+				patch.setActive(true);
+				patch.setColor(players[state].getColor());						
+			}
+			Glove glove = players[state].getGlove();
+			glove.setActive(true);
+			glove.setColor(players[state].getColor());
 		} else if(state == playerNames.length) {
 			parent.changeGameState(GameState.LevelSelect);
 		} else {
@@ -79,11 +83,6 @@ public class PlayerSelect implements UIElement {
 	}
 
 	void cleanup() {
-		if(colorHack != null) {
-			colorHack.stop();
-			colorHack = null;
-		}
-
 		for(Player player : players) {
 			for(Patch patch : player.getPatches()) {
 				// patch.clear();
@@ -188,53 +187,6 @@ public class PlayerSelect implements UIElement {
 		players[PApplet.constrain(state, 0, players.length)].setName(playerNames[selected]);
 		cleanup();
 		stateChange(state + 1);
-	}
-
-	class ColorHacker implements Runnable {
-
-		boolean running;
-		Thread hackerThread;
-
-		ColorHacker() {
-			running = true;
-			hackerThread = new Thread(this);
-			hackerThread.setDaemon(true);
-			hackerThread.start();
-		}
-
-		public void run() {
-			while(running) {
-				if(state < players.length) {
-					for(Patch patch : players[state].getPatches()) {
-						patch.setActive(true);
-						patch.setColor(players[state].getColor());						
-					}
-					Glove glove = players[state].getGlove();
-					glove.setActive(true);
-					glove.setColor(players[state].getColor());
-				} else {
-					running = false;
-					break;
-				}
-
-				try {
-					Thread.sleep(500);
-				} catch(Exception e) {
-
-				}
-			}
-		}
-
-		void stop() {
-			running = false;
-			// hackerThread.interrupt();
-			while(hackerThread != null && hackerThread.isAlive()) Thread.yield();
-		}
-
-		boolean isRunning() {
-			return running;
-		}
-
 	}
 
 }

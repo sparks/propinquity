@@ -199,7 +199,7 @@ public class Propinquity extends PApplet implements PlayerConstants, LevelConsta
 			hardware.addAccelEventListener(level);
 		}
 		
-		levelSelect = new LevelSelect(this, hud, levels);
+		levelSelect = new LevelSelect(this, hud, levels, players);
 
 		//General + Util	
 		uiElements = new Vector<UIElement>();
