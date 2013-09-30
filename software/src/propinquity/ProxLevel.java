@@ -165,7 +165,7 @@ public class ProxLevel extends Level {
 
 	public void startPreview() {
 		fader.stop();
-		song.setGain(-10);
+		song.setGain(-6);
 
 		song.loop();
 	}
