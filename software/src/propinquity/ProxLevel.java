@@ -14,7 +14,7 @@ import java.lang.Math;
  */
 public class ProxLevel extends Level {
 
-	static int TOTAL_LEN = 180000; //3min;
+	static int TOTAL_LEN = 150000; //2.5min;
 
 	long[] lastScoreTime;
 	long[] lastScoreTimePauseDiff;
@@ -164,12 +164,18 @@ public class ProxLevel extends Level {
 	}
 
 	public void startPreview() {
-		song.play();
+		fader.stop();
+		song.setGain(-6);
+
+		song.loop();
 	}
 
 	public void stopPreview() {
 		song.pause();
 		song.rewind();
+
+		// fader.stop();
+		// song.setGain(0);
 	}
 
 	public void useBackgroundColor(boolean useBackgroundColor) {
@@ -264,16 +270,17 @@ public class ProxLevel extends Level {
 			fader.fadeOut();
 			for(Player player : players) player.transferScore();
 		} else if(!steps[currentStep].isTransition() && currentStep > 0 && steps[currentStep-1].isTransition()) {
-			if(!steps[currentStep].hasPause()) dingding.trigger();
-
-			song.play();
+			if(!steps[currentStep].hasPause()) {
+				dingding.trigger();
+				song.play();
+			}
 
 			if(!newSongFlag) {
 				fader.fadeIn();
 			} else {
-				newSongFlag = false;
 				fader.stop();
 				song.setGain(0);
+				newSongFlag = false;
 			}
 		}
 
@@ -663,6 +670,7 @@ public class ProxLevel extends Level {
 					}
 				}
 				song.setGain(-100);
+				if(!running) return;
 				song.pause();
 			}
 		}

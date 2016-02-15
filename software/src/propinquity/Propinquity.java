@@ -182,8 +182,8 @@ public class Propinquity extends PApplet implements PlayerConstants, LevelConsta
 		}
 
 		Patch[] allPatchArr = allPatch.toArray(new Patch[0]);
-		tmp_levels.add(new CultLevel(this, hud, sounds, players, allPatchArr));
-		tmp_levels.add(new OrbLevel(this, hud, sounds, "Orb", players));
+		// tmp_levels.add(new CultLevel(this, hud, sounds, players, allPatchArr));
+		// tmp_levels.add(new OrbLevel(this, hud, sounds, "Orb", players));
 
 		// tmp_levels.add(new BopperLevel(this, hud, sounds, "Besouro.mp3", players));
 		// tmp_levels.add(new HealthLevel(this, hud, sounds, "Leila Came Round And We Watched A Video.mp3", players));
@@ -199,7 +199,7 @@ public class Propinquity extends PApplet implements PlayerConstants, LevelConsta
 			hardware.addAccelEventListener(level);
 		}
 		
-		levelSelect = new LevelSelect(this, hud, levels);
+		levelSelect = new LevelSelect(this, hud, levels, players);
 
 		//General + Util	
 		uiElements = new Vector<UIElement>();

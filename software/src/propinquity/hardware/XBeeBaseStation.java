@@ -5,12 +5,15 @@ import java.lang.System;
 import com.rapplogic.xbee.api.*;
 import com.rapplogic.xbee.api.wpan.*;
 import gnu.io.*;
+import propinquity.*;
 
 /**
- * This class scans for XBees connected to the computer. It then instantiates and holds Xbee objects for each such device.
+ * This class scans for XBees connected to the computer. It then instantiates and holds XBee objects for each such device.
  *
  */
 public class XBeeBaseStation implements Runnable, HardwareInterface, PacketListener {
+
+	static final boolean safeScan = false;
 
 	final int NUM_XBEES_USED = 1; //In a effort to keep some multi XBee functionality I've left this in and most of the multi-XBee support.
 
@@ -57,7 +60,7 @@ public class XBeeBaseStation implements Runnable, HardwareInterface, PacketListe
 	 * @param ni the NodeIdentifier of the requested XBee.
 	 * @return the XBee for the XBee with the matching NodeIdentifier.
 	*/
-	public XBee getXbee(String ni) {
+	public XBee getXBee(String ni) {
 		return xbees.get(ni);
 	}
 
@@ -127,6 +130,24 @@ public class XBeeBaseStation implements Runnable, HardwareInterface, PacketListe
 	public void run() {
 		System.out.println("XBeeBaseStation Scan");
 
+		Vector<String> portsUsed = new Vector<String>();
+
+		if(!safeScan) {
+			String[] basePortNames = new String[0];
+			basePortNames = Serializer.deserialize(basePortNames, "data/basePortNames.ser");
+			if (basePortNames != null) {
+				for(int i = 0; i < basePortNames.length; i++) {
+					System.out.println("Deserialized XBee port: "+basePortNames[i]);
+					if(basePortNames != null && !basePortNames.equals("")) {
+						if(connectXBee(basePortNames[i], XBEE_BAUDRATE)) {
+							portsUsed.add(basePortNames[i]);
+						}
+						if(xbees.size() >= NUM_XBEES_USED) return;
+					}
+				}
+			}
+		}
+
 		String[] availablePorts = getAvailableSerialPorts();
 
 		String osName = System.getProperty("os.name");
@@ -139,59 +160,73 @@ public class XBeeBaseStation implements Runnable, HardwareInterface, PacketListe
 
 			System.out.println("\tConnecting to port: " + availablePorts[portNum] + " ... ");
 
-			XBee xbee = new XBee();
-
-			try {
-				xbee.open(availablePorts[portNum], XBEE_BAUDRATE);
-			} catch(XBeeException e) {
-				System.out.println(e.getMessage());
-				System.out.println("Failed to connect to XBee");
-				continue;
+			if(connectXBee(availablePorts[portNum], XBEE_BAUDRATE)) {
+				portsUsed.add(availablePorts[portNum]);
 			}
-
-			System.out.println("\t\tConnected to XBee");
-
-			try {
-				Thread.sleep(500);
-			} catch(Exception e) {
-
-			}
-			String ni = null;
-			XBeeResponse response = null;
-
-			try {
-				response = xbee.sendSynchronous(new AtCommand("NI"), XBEE_RESPONSE_TIMEOUT);
-			} catch(XBeeTimeoutException e) {
-				System.out.println("\t\tTimeout getting NI");
-				continue;
-			} catch(XBeeException e) {
-				System.out.println("\t\tException getting NI");
-				continue;
-			}
-
-			if(response != null && response.getApiId() == ApiId.AT_RESPONSE) {
-				AtCommandResponse atResponse = (AtCommandResponse)response;
-				if(atResponse.isOk()) {
-					ni = new String(atResponse.getValue(), 0, atResponse.getValue().length);
-					System.out.println("\t\tGot NI: " + ni);
-				} else {
-					System.out.println("\t\tNI Command was not successful");
-					continue;
-				}
-			} else {
-				System.out.println("\t\tNI Response was null or wrong type");
-				continue;
-			}
-
-			xbee.addPacketListener(this);
-			XBee returnedXBee = xbees.put(ni, xbee);
-
-			if(returnedXBee != null) System.err.println("Warning: You have at least two XBees flashed with the same NI: \""+ni+"\". One of the duplicate XBees was dropped.");
-
 			if(xbees.size() >= NUM_XBEES_USED) break;
 		}
 
+		String[] basePortNames = new String[0];
+		basePortNames = portsUsed.toArray(basePortNames);
+
+		Serializer.serialize(basePortNames, "data/basePortNames.ser");
+
 		System.out.println("Scan Complete");
+	}
+
+	public boolean connectXBee(String portName, int baudRate) {
+		XBee xbee = new XBee();
+
+		try {
+			xbee.open(portName, baudRate);
+		} catch(XBeeException e) {
+			System.out.println(e.getMessage());
+			System.out.println("Failed to connect to XBee");
+			return false;
+		}
+
+		System.out.println("\t\tConnected to XBee");
+
+		try {
+			Thread.sleep(500);
+		} catch(Exception e) {
+
+		}
+
+		String ni = null;
+		XBeeResponse response = null;
+
+		try {
+			response = xbee.sendSynchronous(new AtCommand("NI"), XBEE_RESPONSE_TIMEOUT);
+		} catch(XBeeTimeoutException e) {
+			System.out.println("\t\tTimeout getting NI");
+			return false;
+		} catch(XBeeException e) {
+			System.out.println("\t\tException getting NI");
+			return false;
+		}
+
+		if(response != null && response.getApiId() == ApiId.AT_RESPONSE) {
+			AtCommandResponse atResponse = (AtCommandResponse)response;
+			if(atResponse.isOk()) {
+				ni = new String(atResponse.getValue(), 0, atResponse.getValue().length);
+				System.out.println("\t\tGot NI: " + ni);
+			} else {
+				System.out.println("\t\tNI Command was not successful");
+				return false;
+			}
+		} else {
+			System.out.println("\t\tNI Response was null or wrong type");
+			return false;
+		}
+
+		if (xbee != null) {
+			xbee.addPacketListener(this);
+			XBee returnedXBee = xbees.put(ni, xbee);
+			if(returnedXBee != null) System.err.println("Warning: You have at least two XBees flashed with the same NI: \""+ni+"\". One of the duplicate XBees was dropped.");
+		}
+
+		return true;
 	}
 
 	/**
@@ -208,15 +243,19 @@ public class XBeeBaseStation implements Runnable, HardwareInterface, PacketListe
 			CommPortIdentifier com = ports.nextElement();
 			switch(com.getPortType()) {
 				case CommPortIdentifier.PORT_SERIAL:
-				try {
-					CommPort port = com.open("CommUtil", 50);
-					port.close();
+				if (safeScan) {
+					try {
+						CommPort port = com.open("CommUtil", 50);
+						port.close();
+						portNames.add(com.getName());
+					} catch(PortInUseException e) {
+						System.out.println("Port, " + com.getName() + ", is in use.");
+					} catch(Exception e) {
+						System.err.println("Failed to open port " + com.getName());
+						e.printStackTrace();
+					}
+				} else {
 					portNames.add(com.getName());
-				} catch(PortInUseException e) {
-					System.out.println("Port, " + com.getName() + ", is in use.");
-				} catch(Exception e) {
-					System.err.println("Failed to open port " + com.getName());
-					e.printStackTrace();
 				}
 			}
 		}
@@ -272,8 +311,10 @@ public class XBeeBaseStation implements Runnable, HardwareInterface, PacketListe
 
 	public void sendPacket(Packet packet) {
 		if(xbees.size() == 0) return;
-		// sendPacketAsynchronous(packet);
-		sendPacketThrottled(packet);
+		// sendPacketSynchrous(packet);
+		sendPacketAsynchronous(packet);
+		// sendPacketAsynchronousWithMonitor(packet);
+		// sendPacketThrottled(packet);
 	}
 
 	int getNextFrameId() {
@@ -338,6 +379,18 @@ public class XBeeBaseStation implements Runnable, HardwareInterface, PacketListe
 	}
 
 	public void sendPacketAsynchronous(Packet packet) {
+		TxRequest16 request = generateRequest(packet);
+		
+		for(XBee xbee : xbees.values()) {
+			try {
+				xbee.sendAsynchronous(request);
+			} catch(XBeeException e) {
+				System.out.println("\t\tException sending request");
+			}
+		}
+	}
+
+	public void sendPacketAsynchronousWithMonitor(Packet packet) {
 		TxRequest16 request = generateRequest(packet);
 		
 		//Request monitor does all the sending
@@ -469,7 +522,7 @@ public class XBeeBaseStation implements Runnable, HardwareInterface, PacketListe
 				if(throttledPackets.size() == 0) {
 					Thread.yield();
 				} else {
-					sendPacketAsynchronous(throttledPackets.remove(0));
+					sendPacketAsynchronousWithMonitor(throttledPackets.remove(0));
 					// System.out.println(throttledPackets.size());
 					try {
 						if(throttledPackets.size() < 100) Thread.sleep(1);

@@ -11,8 +11,8 @@ import propinquity.Color;
  */
 public class Patch implements HardwareConstants {
 
-	public static final int MIN_RANGE = 250;
-	public static final int MAX_RANGE = 450;
+	public static final int MIN_RANGE = 290;
+	public static final int MAX_RANGE = 850;
 
 	public static final int MIN_SWEETSPOT = 600; //Disabled for now
 	public static final int MAX_SWEETSPOT = 750;
@@ -473,15 +473,23 @@ public class Patch implements HardwareConstants {
 			while(running) {
 				hardware.sendPacket(new Packet(address, PacketType.MODE, new int[] {mode}));
 
-				if(!activeOnly) {
+				if(!activeOnly && getActive()) {
 					hardware.sendPacket(new Packet(address, PacketType.COLOR, new int[] {color[0], color[1], color[2]}));
-					hardware.sendPacket(new Packet(address, PacketType.COLOR_DUTY, new int[] {color_duty}));
-					hardware.sendPacket(new Packet(address, PacketType.COLOR_PERIOD, new int[] {color_period}));
-					hardware.sendPacket(new Packet(address, PacketType.COLOR_WAVEFORM, new int[] {color_waveform}));
+					if(color[0] != 0 || color[1] != 0 || color[2] != 0) {
+						hardware.sendPacket(new Packet(address, PacketType.COLOR_PERIOD, new int[] {color_period}));
+						if(color_period != 0) {
+							hardware.sendPacket(new Packet(address, PacketType.COLOR_DUTY, new int[] {color_duty}));
+							hardware.sendPacket(new Packet(address, PacketType.COLOR_WAVEFORM, new int[] {color_waveform}));
+						}
+					}
 
 					hardware.sendPacket(new Packet(address, PacketType.VIBE, new int[] {vibe_level}));
-					hardware.sendPacket(new Packet(address, PacketType.VIBE_DUTY, new int[] {vibe_duty}));
-					hardware.sendPacket(new Packet(address, PacketType.VIBE_PERIOD, new int[] {vibe_period}));
+					if(vibe_level != 0) {
+						hardware.sendPacket(new Packet(address, PacketType.VIBE_PERIOD, new int[] {vibe_period}));
+						if(vibe_period != 0) {
+							hardware.sendPacket(new Packet(address, PacketType.VIBE_DUTY, new int[] {vibe_duty}));
+						}
+					}
 				}
 
 				try {

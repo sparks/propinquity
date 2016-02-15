@@ -73,6 +73,10 @@ public class Particle {
 		return color;
 	}
 
+	public void setColor(Color color) {
+		this.color = color;
+	}
+
 	public Vec2 getPosition() {
 		return position;
 	}
