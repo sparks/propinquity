@@ -69,4 +69,14 @@ public class Glove extends Patch {
 
 	}
 
+	public void setTime(long time) {
+		this.time = time;
+	}
+
+	long time;
+
+	public long getTime() {
+		return time;
+	}
+
 }

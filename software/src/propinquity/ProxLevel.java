@@ -211,7 +211,7 @@ public class ProxLevel extends Level {
 		startTime = -1;
 
 		for(Player player : players) {
-			player.configurePatches(Mode.PROX);
+			player.configurePatches(Mode.PROX | Mode.ACCEL_XYZ);
 			player.reset(); //Clears all the particles, scores, patches and gloves
 		}
 
@@ -331,9 +331,23 @@ public class ProxLevel extends Level {
 		//Handle patch feedback
 		patch.setMode(patch.getZone());
 	}
-	
-	public void accelXYZEvent(Patch patch) {
 
+	public void accelXYZEvent(Patch patch) {
+		for (Player p : players) {
+			if (p.isPatchOwner(patch)) {
+				Glove glove = p.getGlove();
+
+				int accelPwr = patch.getAccelX()*patch.getAccelX() + patch.getAccelY()*patch.getAccelY() + patch.getAccelZ()*patch.getAccelZ();
+				if (accelPwr > 60) {
+					glove.setMode(1);
+					glove.setTime(System.currentTimeMillis());
+				} else {
+					if (System.currentTimeMillis() - glove.getTime() > 500) {
+						glove.setMode(0);
+					}
+				}
+			}
+		}
 	}
 
 	public void accelInterrupt0Event(Patch patch) {
@@ -352,10 +366,10 @@ public class ProxLevel extends Level {
 			Glove glove = players[i].getGlove();
 			if(glove.getActive()) {
 				Patch bestPatch = players[(i+1)%players.length].getBestPatch(); //TODO: Hack being use to get opponent. Nothing significantly better can be done with this hardware.
-				if(bestPatch != null) glove.setMode(bestPatch.getZone());
-				else glove.setMode(0);
+				// if(bestPatch != null) glove.setMode(bestPatch.getZone());
+				// else glove.setMode(0);
 			} else {
-				glove.setMode(0);
+				// glove.setMode(0);
 			}
 		}
 
