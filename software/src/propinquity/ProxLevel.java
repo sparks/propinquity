@@ -338,11 +338,11 @@ public class ProxLevel extends Level {
 				Glove glove = p.getGlove();
 
 				int accelPwr = patch.getAccelX()*patch.getAccelX() + patch.getAccelY()*patch.getAccelY() + patch.getAccelZ()*patch.getAccelZ();
-				if (accelPwr > 60) {
+				if (accelPwr > 80) {
 					glove.setMode(1);
 					glove.setTime(System.currentTimeMillis());
 				} else {
-					if (System.currentTimeMillis() - glove.getTime() > 500) {
+					if (System.currentTimeMillis() - glove.getTime() > 1000) {
 						glove.setMode(0);
 					}
 				}
